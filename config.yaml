@@ -1,0 +1,45 @@
+# config.yaml
+
+# 📁 DATA PATHS
+data_paths:
+  raw_data: data/raw
+  processed_data: data/processed
+  networks: data/networks
+  visuals: data/visuals
+
+# 📄 FILE NAMES
+files:
+  excel_pattern: PCOS  # used to match the Excel file
+  cleaned_csv: cleaned_pcos_data.csv
+  transformed_csv: binary_transformed_pcos_data.csv
+  patients_with_pcos: patients_with_pcos.csv
+  patients_without_pcos: patients_without_pcos.csv
+  binning_metadata: binning_metadata.json
+
+# 🌐 NETWORK CONFIGURATION
+network:
+  min_edge_weight: 150
+  top_n_nodes: 30
+  layout_seed: 42
+  export_stats: true
+  export_top_nodes: true
+
+# 📊 VISUALIZATION OUTPUT NAMES
+visuals:
+  static_image: network_static.png
+  html_network: interactive_network.html
+  heatmap: heatmap.png
+  communities: communities.png
+
+# 🔎 COLUMN NAMES
+columns:
+  pcos_label: PCOS (Y/N)
+
+# 🧼 CLEANING RULES
+cleaning:
+  missing_threshold: 0.5
+  exclude_cols_from_binning:
+    - sl._no
+    - patient_file_no.
+    - patient_id
+  number_of_bins: 3  # 👈 Added this line for interactive bin configuration

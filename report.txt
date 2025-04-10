@@ -1,0 +1,79 @@
+
+PCOS Symptom Network Analysis
+Academic Report for Lab Course: "Network Science and Telematics"
+Submitted by Iroda Ulmasboeva
+------------------------------------------------------------
+Abstract
+------------------------------------------------------------
+This project outlines a practical step-by-step approach for analyzing clinical data from patients with Polycystic Ovary Syndrome (PCOS) using network science techniques. Starting from raw data, we walk through data cleaning, transformation, and visualization to better understand how symptoms relate and possibly form clusters that could point to PCOS subtypes. The work was completed as part of the "Network Science and Telematics" lab course.
+
+------------------------------------------------------------
+Introduction
+------------------------------------------------------------
+Polycystic Ovary Syndrome (PCOS) is a complex condition with a wide range of symptoms that can vary significantly from patient to patient. Better understanding the way these symptoms relate to one another can help refine diagnosis and treatment. This project uses network analysis to study how PCOS symptoms tend to co-occur in clinical data, with the goal of uncovering patterns and groupings that may reveal meaningful insights.
+
+------------------------------------------------------------
+Methodology
+------------------------------------------------------------
+1. Data Acquisition
+We used the dataset named *PCOS_data_without_infertility.xlsx*, which contains information about patients diagnosed with PCOS. It excludes cases involving infertility, focusing instead on a range of symptoms and clinical features.
+
+2. Configuration
+A YAML configuration file (*config.yaml*) was used to centralize important parameters for the analysis, such as file paths, thresholds, visualization settings, and data cleaning rules. This setup allows for flexibility when modifying the pipeline.
+
+3. Data Preprocessing
+Data cleaning and transformation were handled by *data_cleaning.py*. This script:
+- Removes columns with more than 50% missing values.
+- Deals with missing data according to the rules defined in the configuration file.
+- Converts some features into binary format to support symptom co-occurrence analysis.
+
+At the end of this step, we have two datasets: one cleaned and one converted into binary form.
+
+4. Symptom Co-occurrence Analysis
+We analyzed how often symptoms appear together using *symptom_coocurence.py*. The result is a co-occurrence matrix showing how frequently each pair of symptoms co-occur in the dataset. This matrix is the foundation for building the network.
+
+5. Network Construction and Visualization
+With the help of *network_utils.py*, we built a network where:
+- Each symptom is a node.
+- An edge represents the co-occurrence between two symptoms.
+- We filtered out weaker connections using a threshold defined in the config file.
+
+We calculated basic network stats like degree centrality and clustering coefficients.
+
+Using *symptom_network_visuals.py*, we created:
+- A static network diagram (PNG).
+- An interactive HTML version for exploring the network.
+- A heatmap to show symptom co-occurrence intensity.
+- Community detection visuals using the Louvain algorithm to find symptom clusters.
+
+------------------------------------------------------------
+Results
+------------------------------------------------------------
+The pipeline produced:
+- Cleaned and binary datasets ready for use.
+- A static image showing the overall structure of symptom relationships.
+- An interactive HTML network for exploring connections in more detail.
+- A heatmap that highlights which symptoms tend to appear together most often.
+- Community detection visuals that hint at possible PCOS subtypes based on symptom clusters.
+
+------------------------------------------------------------
+Discussion
+------------------------------------------------------------
+The symptom network helps visualize how different PCOS symptoms connect and group together. Some of the clusters we found may correspond to known clinical subtypes. This network-based approach could help researchers explore symptom patterns in a more structured way.
+
+There’s room for extending the project. For example, we could include hormone levels or genetic data, or analyze how symptoms change over time. Future work might also connect symptom clusters with patient outcomes.
+
+------------------------------------------------------------
+Conclusion
+------------------------------------------------------------
+This project offers a practical way to move from raw clinical data to meaningful insights using network analysis. Through data cleaning, transformation, and visualization, we were able to uncover potential groupings of PCOS symptoms that could guide further research. The pipeline is general enough to be adapted for studying other complex medical conditions as well.
+
+------------------------------------------------------------
+Acknowledgments
+------------------------------------------------------------
+This project was completed as part of the "Network Science and Telematics" lab course. Thanks to the instructors and classmates who gave helpful feedback along the way. For questions or collaboration, contact Iroda Ulmasboeva at ulmasboevairoda@gmail.com.
+
+------------------------------------------------------------
+References
+------------------------------------------------------------
+- Louvain Algorithm Reference: Blondel, V. D., Guillaume, J. L., Lambiotte, R., & Lefebvre, E. (2008). Fast unfolding of communities in large networks. Journal of Statistical Mechanics: Theory and Experiment, 2008(10), P10008. https://doi.org/10.1088/1742-5468/2008/10/P10008
