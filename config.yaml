@@ -42,4 +42,9 @@ cleaning:
     - sl._no
     - patient_file_no.
     - patient_id
-  number_of_bins: 3  # 👈 Added this line for interactive bin configuration
+  number_of_bins: 3
+  always_keep_columns:
+    - PCOS (Y/N)
+  log_dropped_columns: true
+  normalize_numeric: false
+

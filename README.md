@@ -92,4 +92,4 @@ This project builds an integrated analytical pipeline that transforms raw clinic
 📚 Credits
 ----------
 Created by Iroda Ulmasboeva as part of a Network Science and Telematics Lab.
-For questions or collaboration, please contact: ulmasboevairoda@gmail.com
+For questions/collaboration: ulmasboevairoda@gmail.com
