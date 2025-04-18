@@ -9,19 +9,19 @@
 
 ---
 
-## 📝 Abstract
+##Abstract
 
 This project presents a practical and technical pipeline for analyzing symptom relationships in Polycystic Ovary Syndrome (PCOS) using network science techniques. Beginning with raw clinical data, we perform cleaning, transformation, co-occurrence analysis, and visualization to uncover potential symptom clusters. These insights may help in identifying PCOS subtypes and improving diagnostic precision. This work was conducted as part of the "Network Science and Telematics" course.
 
 ---
 
-## 📌 Introduction
+##Introduction
 
 PCOS is a multifaceted condition affecting hormonal levels, metabolism, and reproductive health. Symptoms vary across patients, making standardized diagnosis challenging. This project uses network analysis to map symptom interconnections and reveal community structures that may point to clinical subtypes.
 
 ---
 
-## 🧪 Methodology
+##Methodology
 
 ### 1. Data Acquisition
 Dataset used: **PCOS_data_without_infertility.xlsx**  
@@ -68,7 +68,7 @@ Community detection: **Louvain algorithm**
 
 ---
 
-## 📊 Results
+##Results
 
 - **Total nodes:** 28 symptoms
 - **Total edges:** 156 co-occurrences
@@ -80,7 +80,7 @@ Visual outputs clearly show groups of symptoms that often appear together, sugge
 
 ---
 
-## 🧠 Discussion
+##Discussion
 
 The generated network helps visualize inter-symptom dynamics in PCOS. Community detection revealed clusters potentially corresponding to metabolic, dermatological, and reproductive symptoms. These findings align with known PCOS subtypes in clinical literature.
 
@@ -91,7 +91,7 @@ Future improvements may include:
 
 ---
 
-## 🔧 Technical Strengths
+##Technical Strengths
 
 - Modular Python codebase
 - Configurable YAML settings
@@ -100,19 +100,19 @@ Future improvements may include:
 
 ---
 
-## 🎓 Conclusion
+##Conclusion
 
 This hybrid pipeline combines clinical insight with network science methodology to analyze PCOS symptoms. The process is adaptable for other conditions and is structured for reproducibility, clarity, and further exploration.
 
 ---
 
-## 🙏 Acknowledgments
+##Acknowledgments
 
 This work was conducted for the "Network Science and Telematics" lab course. Grateful thanks to instructors and peers for valuable guidance and feedback.
 
 ---
 
-## 📚 References
+##References
 
 - Blondel, V. D., Guillaume, J. L., Lambiotte, R., & Lefebvre, E. (2008). *Fast unfolding of communities in large networks*. Journal of Statistical Mechanics: Theory and Experiment, 2008(10), P10008.
 - March, W. A., et al. (2010). *The prevalence of PCOS in a community sample assessed under contrasting diagnostic criteria*. Human Reproduction, 25(2), 544–551.
