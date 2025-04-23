@@ -8,23 +8,25 @@ from pathlib import Path
 import re
 from colorama import init, Fore, Style
 
-# 🎛️ Setup robust + styled logging
+# Initialize color formatting for terminal output
 init(autoreset=True)
 
+# Reset logging handlers to avoid duplication in some environments (e.g., Jupyter)
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(handler)
 
+# Configure logging style
 logging.basicConfig(
     level=logging.INFO,
     format="• %(message)s",
     handlers=[logging.StreamHandler()]
 )
 
-# 🎨 Highlight content inside curly braces
+# Utility to color-highlight content inside curly braces
 def highlight_braces(text, color=Fore.CYAN):
     return re.sub(r"\{(.*?)\}", lambda m: "{" + color + m.group(1) + Style.RESET_ALL + "}", text)
 
-# 🧾 Wrapper for logging
+# Logging wrapper for consistent log style
 def log(msg):
     logging.info(highlight_braces(msg))
 
@@ -34,10 +36,13 @@ def load_config():
     current_path = Path(__file__).resolve()
     project_root = current_path.parent.parent
     config_path = project_root / "config.yaml"
+
     if not config_path.exists():
         raise FileNotFoundError(f"Config file not found at {config_path}")
+
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
+
     log("Configuration loaded ✓")
     return config, project_root
 
@@ -53,21 +58,27 @@ def find_excel_file(raw_dir, pattern):
 
 
 def load_and_prepare_data(file_path, pcos_label):
+
     log(f"Reading Excel file → {{ {file_path} }}")
     xls = pd.ExcelFile(file_path)
+
+    # Use first likely data-relevant sheet name
     sheet_name = next(
         (s for s in xls.sheet_names if "data" in s.lower() or "pcos" in s.lower()),
         xls.sheet_names[-1]
     )
+
     log(f"Using sheet: {{ {sheet_name} }}")
     df = pd.read_excel(xls, sheet_name=sheet_name)
 
     if df.empty:
         raise ValueError(f"Sheet '{sheet_name}' is empty.")
 
+    # Clean column names
     df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
     df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
 
+    # Locate the correct PCOS label column
     log("Looking for the PCOS indicator column...")
     pcos_cols = []
     for column in df.columns:
@@ -88,6 +99,7 @@ def load_and_prepare_data(file_path, pcos_label):
 
 
 def clean_data(df, config):
+
     threshold = config["cleaning"]["missing_threshold"]
     pcos_label = config["columns"]["pcos_label"]
 
@@ -99,6 +111,7 @@ def clean_data(df, config):
     for col in df.select_dtypes(include=["object"]).columns:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
+    # Drop columns exceeding missing data threshold
     dropped = df.columns[df.isnull().mean() >= threshold].tolist()
     if dropped:
         log(f"Dropping {{ {len(dropped)} }} column(s) with too many missing values: {{ {dropped} }}")
@@ -108,6 +121,7 @@ def clean_data(df, config):
         columns_to_keep.append(pcos_label)
     df = df[columns_to_keep]
 
+    # Impute missing values
     log("Filling missing values...")
     for col in df.columns:
         if df[col].dtype == "object":
@@ -117,12 +131,16 @@ def clean_data(df, config):
         else:
             df[col] = df[col].fillna(df[col].median())
 
+    # Ensure PCOS label is the first column
     df = df[[pcos_label] + [col for col in df.columns if col != pcos_label]]
     log(f"Cleaning complete ✓ Final shape: {{ {df.shape[0]} }} rows × {{ {df.shape[1]} }} columns")
     return df
 
 
 def is_discrete_numeric_category(series, min_unique=4, max_unique=20):
+    """
+    Identifies integer-like numeric features that behave as discrete categories.
+    """
     if not pd.api.types.is_numeric_dtype(series):
         return False
     unique_vals = series.dropna().unique()
@@ -130,6 +148,9 @@ def is_discrete_numeric_category(series, min_unique=4, max_unique=20):
 
 
 def bin_numeric_columns(df, config):
+    """
+    Bins continuous numeric columns and encodes them using one-hot encoding.
+    """
     log("Binning numeric features...")
 
     exclude = config["cleaning"]["exclude_cols_from_binning"]
@@ -162,6 +183,7 @@ def bin_numeric_columns(df, config):
             log(f"Skipping '{{ {feature} }}' — not enough values to bin")
             continue
 
+        # Generate bin edges and labels
         bin_edges = np.linspace(df[feature].min(), df[feature].max(), bins + 1)
         bin_edges = np.unique(bin_edges)
         if len(bin_edges) < 2:
@@ -193,6 +215,9 @@ def bin_numeric_columns(df, config):
 
 
 def encode_categoricals(df, ml_df, config):
+    """
+    Encodes binary and multi-class categorical columns using one-hot encoding.
+    """
     log("Encoding categorical features...")
 
     pcos_label = config["columns"]["pcos_label"]
@@ -214,7 +239,10 @@ def encode_categoricals(df, ml_df, config):
 
 
 def save_outputs(df, ml_df, binned_columns, config, base_dir):
-    log("Saving files to disk...")
+    """
+    Saves cleaned and transformed data, and exports metadata for downstream processing.
+    """
+    log("Saving files...")
     processed = base_dir / config["data_paths"]["processed_data"]
     processed.mkdir(parents=True, exist_ok=True)
 
@@ -228,16 +256,18 @@ def save_outputs(df, ml_df, binned_columns, config, base_dir):
         json.dump(binned_columns, f, indent=2)
     log("✔ Binning metadata saved")
 
+    # Separate PCOS vs non-PCOS groups for downstream analysis
     pcos_label = config["columns"]["pcos_label"]
     df_pcos = ml_df[ml_df[pcos_label] == 1]
     df_no_pcos = ml_df[ml_df[pcos_label] == 0]
 
     df_pcos.to_csv(processed / config["files"]["patients_with_pcos"], index=False)
     df_no_pcos.to_csv(processed / config["files"]["patients_without_pcos"], index=False)
-    log("✔ PCOS cohort files saved")
+    log("✔ PCOS and non_PCOS files saved separately")
 
 
 def main():
+    # Pipeline entry point
     config, base_dir = load_config()
     raw_dir = base_dir / config["data_paths"]["raw_data"]
     file_path = find_excel_file(raw_dir, config["files"]["excel_pattern"])
@@ -250,7 +280,7 @@ def main():
     ml_df = encode_categoricals(df, ml_df, config)
 
     save_outputs(df, ml_df, binned_columns, config, base_dir)
-    log("🎉 All done! Data pipeline complete ✓")
+    log("Finished!")
 
 
 if __name__ == "__main__":
